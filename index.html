@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dot Grid</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+
+        #backgroundVideo {
+            position: absolute;
+            top: 2%;
+            left: 2%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        #dotCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <video id="backgroundVideo" autoplay loop muted>
+        <source src="wpbackground.webm" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <canvas id="dotCanvas"></canvas>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('backgroundVideo');
+            const canvas = document.getElementById('dotCanvas');
+
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            let currentX = 0, currentY = 0;
+            const smoothingFactor = 0.02;
+            let parallaxStrength = 0.35;
+            let videoScale = 1.1;
+            let videoSize = 110; // Percentage size of the video
+
+            // Function to set parallax strength
+            function setParallaxStrength(strength) {
+                parallaxStrength = strength;
+            }
+
+            // Function to set video size
+            function setVideoSize(sizePercentage) {
+                videoSize = sizePercentage;
+                video.style.width = `${videoSize}%`;
+                video.style.height = `${videoSize}%`;
+            }
+
+            // Update the initial transform to ensure the video starts centered
+            video.style.transform = `translate(-50%, -50%) scale(${videoScale})`;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) - 0.5;
+                mouseY = (e.clientY / window.innerHeight) - 0.5;
+
+                targetX = mouseX * parallaxStrength * 100;
+                targetY = mouseY * parallaxStrength * 100;
+            });
+
+            function animate() {
+                currentX += (targetX - currentX) * smoothingFactor;
+                currentY += (targetY - currentY) * smoothingFactor;
+
+                video.style.transform = `translate(${currentX}%, ${currentY}%) scale(${videoScale})`;
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Example: Set the parallax strength to 0.5
+            setParallaxStrength(0.06);
+            // Example: Set the video size to 120%
+            setVideoSize(100);
+        });
+    </script>
+</body>
+</html>
